@@ -8,7 +8,7 @@ Cross Platform Feetech Servo Tuner Tool
 
 _This tool is provided as a utility tool for reading and setting registers and parameters from Feetech servos. You should ensure
 that you understand the usage and function of these registers before manipulating them. It may be possible to damage your servo motor
-or to render it unusable if you set these registers incorrectly. Consult the Feetech factory documentation for your servos before 
+or to render it unusable if you set these registers incorrectly. Consult the Feetech factory documentation for your servos before
 using the tool!_
 
 You should become familiar with the Feetech Servo Tutorial and how these operations work using the official toolset before attempting
@@ -19,7 +19,7 @@ https://www.feetechrc.com/Data/feetechrc/upload/file/20201127/start%20%20tutoria
 
 ### SCS Servo Family
 
-This tool has currently been tested with the STS servo family from Feetech. While we do support SCS servos as well via the flags, 
+This tool has currently been tested with the STS servo family from Feetech. While we do support SCS servos as well via the flags,
 this functionality is currently not well tested. If you use SCS servos with it, we would appreciate hearing about your results.
 
 ## Hardware and Connections
@@ -38,7 +38,7 @@ PR's.
 ## Installation
 
 ### Python Versions
-We recommend Python 3.10 or later. Earlier versions (such as 3.8) have some issues on Windows. 
+We recommend Python 3.10 or later. Earlier versions (such as 3.8) have some issues on Windows.
 
 ### Python Virtual Environment
 We recommend using a Python Virtual Environment to manage dependencies and packages for the project.
@@ -85,7 +85,7 @@ python tuna.py /dev/ttyUSB0
 ```
 
 ### Determining Serial Ports on Linux
-One common issue with the Feetech URT-1 on Linux is a conflict with the brltty (Braille TTY) service on the machine. This plagues other microcontrollers and connections as well. 
+One common issue with the Feetech URT-1 on Linux is a conflict with the brltty (Braille TTY) service on the machine. This plagues other microcontrollers and connections as well.
 BraileTTY is an accessibility tool that may not be necessary unless you are visually impaired. If you find your URT-1 device is not appearing, or is connecting and then disconnecting
 from a Linux machine, you may want to have a look at this link:
 
@@ -159,7 +159,7 @@ python tuna.py COMxx
 
 ## Usage and Commands
 
-Once the tuner is active and connected to to the URT-1 serial port, you can use the following commands at the prompt. 
+Once the tuner is active and connected to to the URT-1 serial port, you can use the following commands at the prompt.
 
 ### List Command
 
@@ -316,7 +316,7 @@ This will exit Feetech-tuna and shut down the serial port properly.
 
 ## Servo Template System
 We anticipate that one of the most typical use cases for Feetech-tuna will be in commissioning new servos. To assist this,
-we have created a basic templating system where you can define Servo ID's and Register Values that you would like to load 
+we have created a basic templating system where you can define Servo ID's and Register Values that you would like to load
 onto a servo in a single operation.
 
 __servotemplates.py__ contains a dictionary that you can customize with your own servo templates. It's pretty straightforward:
@@ -324,8 +324,8 @@ __servotemplates.py__ contains a dictionary that you can customize with your own
 ```
 # Template table for servo registers
 servoTemplates = {
-    101 : { 
-        9 : 1500,   # Min Angle Limit 
+    101 : {
+        9 : 1500,   # Min Angle Limit
         11 : 3000,  # Max Angle Limit
         13 : 70,    # Max Temperature Limit
         18 : 253,   # Phase
@@ -335,15 +335,51 @@ servoTemplates = {
 ```
 
 The data type is just a dictionary with the key being a servo ID, and then the values being a dictionary of register addresses and the values
-you would like to initialize them to. Again - ensuring these are valid values is up to you, but the tuner will attempt to write them into a 
+you would like to initialize them to. Again - ensuring these are valid values is up to you, but the tuner will attempt to write them into a
 the currently selected servo when you issue the command:
 
 ```
 >> loadtemplate <template ID>
 ```
 
+## LeRobot SO-ARM101 Robotic Arm
 
+This library enables you to setup `LeRobot` with a MacOS. Software given by FeeTech `FT SCServo Debug` available a (this address)[https://www.feetechrc.com/software.html] is only available for Windows. Although there are no GUI yet to setup LeRobot, you can use this CLI library to setup it the same way.
 
+### Instructions
+
+Every instruction given in the (Assembly and Setup Guide)[https://www.youtube.com/watch?v=70GuJf2jbYk] can be done using the CLI. For every Servo, do the following:
+- Plug `Feetech URT-1` without any Servo
+- Find serial Port using `ls /dev/tty.usb*`. On recent mac, it looks like: `/dev/tty.usbmodem...`.
+- Open the serial using `python tuna.py /dev/tty.usbmodem...`
+- For each servo of `LeRobot`:
+  1. Remove power cable from `URT-1`
+  2. Plug servo
+  3. Re-plug power cable
+  4. Select servo 1 (Every servo is by default `ID 1`)
+  ```
+  >> select 1
+  ```
+  5. Unlock `EEPROM` command by using
+  ```
+  >> unlockeeprom
+  ```
+  6. Set Amax (As explained in the video. The value might change in the future)
+  ```
+  >> writereg 85 254
+  ```
+  7. Set ID
+  ```
+  >> writereg 5 <ID>
+  ```
+  8. Change selection to new ID
+  ```
+  >> select <ID>
+  ```
+  9. Save the changes by locking `EEPROM`
+  ```
+  >> lockeeprom
+  ```
 
 
 
